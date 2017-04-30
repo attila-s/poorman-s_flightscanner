@@ -15,7 +15,7 @@ Retrieve flight dates and prices from Wizz Air using its REST API 3.8.0/Api/asse
  -l|--list            List airport codes available from BUD
 
 Examples:
-  $0 --out CANARY -o BUD --dest FUE,ACE,TFS -d 2017-01-02 -p 4
+  $0 --out CANARY -o BUD --dest FUE,ACE,TFS -d $(date +"%Y-%m-%d") -p 4
 EOF
   exit
 } 
@@ -98,7 +98,7 @@ process() {
     day=${start_day};
     for i in $(seq 1 ${period}); do   
       day=$($DATE_CMD '+%Y-%m-%d' -d "$day+10 days");
-      api_version="4.0.0"
+      api_version="4.4.0"
       endpoint="/Api/asset/farechart"
       curl 'https://be.wizzair.com/'${api_version}${endpoint}\
         -H 'pragma: no-cache' \
