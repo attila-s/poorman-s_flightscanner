@@ -30,7 +30,7 @@ print "Displaying flights whose price is <", MAX, "\n"
 Flight = collections.namedtuple('Flight', ['out', 'ret', 'date', 'daz', 'price'], verbose=False) 
 flight_map = []
 
-def printFlights( flight_type ):
+def printFlights(doc, flight_type):
   for f in doc[flight_type]:      
     if f['price'] is None:
       continue
@@ -57,10 +57,13 @@ def printFlights( flight_type ):
 
 for arg in args.prices:
   try:
-    j=open(arg).read()
-    doc=json.loads(j)
-    printFlights('outboundFlights')
-    printFlights('returnFlights')
+    data = open(arg)
+    line = data.readline()
+    while line:
+      doc = json.loads(line)
+      printFlights(doc, 'outboundFlights')
+      printFlights(doc, 'returnFlights')
+      line = data.readline()
   except:
     print arg, 'is strange'
     
