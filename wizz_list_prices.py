@@ -27,7 +27,7 @@ else:
   MAX = int(args.max)
 print "Displaying flights whose price is <", MAX, "\n"
 
-Flight = collections.namedtuple('Flight', ['out', 'ret', 'date', 'daz', 'price'], verbose=False) 
+Flight = collections.namedtuple('Flight', ['out', 'ret', 'date', 'daz', 'price', 'currency'], verbose=False) 
 flight_map = []
 
 def printFlights(doc, flight_type):
@@ -46,13 +46,8 @@ def printFlights(doc, flight_type):
       continue
     if flight_type == "returnFlights" and not args.ret is None and weekday not in args.ret:
       continue
-      
-    ##if flight_type == "outboundFlights":
-     ##sys.stdout.write(">> ")
-    ##if flight_type == "returnFlights":
-     ##sys.stdout.write("<< ") 
     
-    flight = Flight(f['departureStation'], f['arrivalStation'], flight_date, weekday, f['price']['amount'])
+    flight = Flight(f['departureStation'], f['arrivalStation'], flight_date, weekday, f['price']['amount'], f['price']['currencyCode'])
     flight_map.append(flight)
 
 for arg in args.prices:
@@ -68,4 +63,4 @@ for arg in args.prices:
     print arg, 'is strange'
     
 for f in sorted(flight_map, key = lambda x : x[2]):
-  print('%s %s %s %s\t%s' %f)
+  print('%s %s %s %s\t%s %s' %f)
