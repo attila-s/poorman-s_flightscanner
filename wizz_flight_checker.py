@@ -3,33 +3,36 @@ import argparse
 import datetime
 import sys
 import logging
+from requests_futures.sessions import FuturesSession
 
-# Parse args
-parser = argparse.ArgumentParser('Poorman\'s flight scanner')
-parser.add_argument('--from')
-parser.add_argument('--to')
-parser.add_argument('--start')
-parser.add_argument('--end')
+def parseArgs():
+  parser = argparse.ArgumentParser('Poorman\'s flight scanner')
+  parser.add_argument('--from')
+  parser.add_argument('--to')
+  parser.add_argument('--start')
+  parser.add_argument('--end')
 
-args = vars(parser.parse_args())
-day=args['start']
-till=args['end']
+  args = vars(parser.parse_args())
+  day = args['start']
+  till = args['end']
 
-logging.debug(args)
+  logging.debug(args)
 
-# Determine time intervals and fetch flight
-start_date = datetime.datetime.strptime(day, "%Y-%m-%d")
-end_date = datetime.datetime.strptime(till, "%Y-%m-%d")
+  # Determine time intervals and fetch flight
+  start_date = datetime.datetime.strptime(day, "%Y-%m-%d")
+  end_date = datetime.datetime.strptime(till, "%Y-%m-%d")
 
-# validation
-exit(1) if (end_date < start_date) else logging.info("Dates OK\n")
+  # validation
+  exit(1) if (end_date < start_date) else logging.info("Dates OK\n")
 
+  act_date = start_date
+  logging.info(start_date.date())
+  departure = args['from']
+  destinations = args['to'].split(',')
 
-act_date =start_date
-logging.info(start_date.date())
-s = requests.Session()
+  return (departure, destinations, start_date, end_date)
 
-def fetch(dep,dest,day,s):
+def fetch(dep, dest, day, s, futures):
   url = "https://be.wizzair.com/5.3.0/Api/asset/farechart"
   payload = "{\"wdc\":false,\"flightList\":[{\"departureStation\":\"" + dep + "\",\"arrivalStation\":\"" + dest + "\",\"date\":\"" + day + "\"},{\"departureStation\":\"" + dest + "\",\"arrivalStation\":\"" + dep + "\",\"date\":\"" + day + "\"}],\"dayInterval\":10,\"adultCount\":1,\"childCount\":0,\"isRescueFare\":false}"
   logging.debug(payload)
@@ -48,16 +51,25 @@ def fetch(dep,dest,day,s):
     'referer': 'https://wizzair.com/'
   }
 
-  response = s.post(url, data=payload, headers=headers)
+  futures.append(s.post(url, data=payload, headers=headers))
 
-  print(response.text)
+def iterateDates(departure, destination, act_date, end_date, s, futures):
+  while (act_date < end_date):
+    logging.debug(act_date.date())
+    fetch(departure, destination, act_date.strftime("%Y-%m-%d"), s, futures)
+    act_date = act_date + datetime.timedelta(days=10)
 
+def printFlights(futures):
+  for response in futures:
+    print(response.result().text)
 
+def main():
+  (departure, destinations, act_date, end_date) = parseArgs()
 
-while (act_date < end_date):
-  logging.debug(act_date.date())
-  fetch(args['from'], args['to'], act_date.strftime("%Y-%m-%d"), s)
-  act_date = act_date + datetime.timedelta(days=10)
+  s = FuturesSession()
+  futures = []
+  for dest in destinations:
+    iterateDates(departure, dest, act_date, end_date, s, futures)
+  printFlights(futures);
 
-
-
+main()
