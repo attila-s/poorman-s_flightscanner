@@ -1,0 +1,21 @@
+<!doctype html>
+<title>Hello from Flask</title>
+{% if name %}
+<h1>Hello {{ name }}!</h1>
+{% else %}
+<h1>Hello, World!</h1>
+{% endif %}
+
+
+
+<table>
+		{% for item in items %}
+		<TR>
+				<TD class="c1">{{item.src}}</TD>
+				<TD class="c2">{{item.dst}}</TD>
+				<TD class="c3">{{item.date}}</TD>
+				<TD class="c4"><SPAN>{{item.day}}</SPAN></TD>
+				<TD class="c5"><SPAN>{{item.price}}</SPAN></TD>
+		</TR>
+		{% endfor %}
+</table>
