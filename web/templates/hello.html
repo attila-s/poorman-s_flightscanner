@@ -6,7 +6,15 @@
 <h1>Hello, World!</h1>
 {% endif %}
 
+<input id="meeting" type="date" value="2011-01-13"/>
+    <script src="/static/js/moment.min.js"></script>
+{{ momentjs(date).calendar() }}
 
+
+<form action="{{ url_for('handle_data') }}" method="post">
+        <input type="text" name="projectFilepath">
+            <input type="submit">
+        </form>
 
 <table>
 		{% for item in items %}
@@ -18,4 +26,5 @@
 				<TD class="c5"><SPAN>{{item.price}}</SPAN></TD>
 		</TR>
 		{% endfor %}
-</table>
+    </table>
+
