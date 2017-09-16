@@ -40,18 +40,25 @@ def parseArgs():
 
   logging.debug(vargs)
 
-  # Determine time intervals and fetch flight
-  start_date = datetime.datetime.strptime(day, "%Y-%m-%d")
-  end_date = datetime.datetime.strptime(till, "%Y-%m-%d")
+  start_date = datetime.datetime.now
+  end_date = datetime.datetime.now
+  if not args.list:
+    # Determine time intervals and fetch flight
+    start_date = datetime.datetime.strptime(day, "%Y-%m-%d")
+    end_date = datetime.datetime.strptime(till, "%Y-%m-%d")
 
-  # validation
-  exit(1) if (end_date < start_date) else logging.info("Dates OK\n")
+    # validation
+    exit(1) if (end_date < start_date) else logging.info("Dates OK\n")
 
-  act_date = start_date
-  logging.info(start_date.date())
+    act_date = start_date
+    logging.info(start_date.date())
+
   departure = vargs['from'].split(',')
-  destinations = vargs['to'].split(',')
-  
+
+  destinations=[]
+  if not args.list:
+    destinations = vargs['to'].split(',')
+   
   action = 'scrape'
   if args.list:
     action = 'list'
